@@ -1,6 +1,7 @@
 # Trading Positional Complexity vs Deepness in Coordinate Networks
 ### [Project Page]() | [Paper]()
-[![Explore Siren in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/vsitzmann/siren/blob/master/explore_siren.ipynb)<br>
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 
 [Jianqiao Zheng](https://github.com/osiriszjq/),
 [Sameera Ramasinghe](),
@@ -15,6 +16,7 @@ This is the official implementation of the paper "Trading Positional Complexity 
     
     
 ## Google Colab
+[![Explore Siren in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/vsitzmann/siren/blob/master/explore_siren.ipynb)<br>
 If you want to try out our new complex encoding, we have written a [Colab](https://colab.research.google.com/github/vsitzmann/siren/blob/master/explore_siren.ipynb) with the following experiments:
 * simple encoding for 2D image reconstuction with separable coordinates
 * complex encoding for 2D image reconstuction with separable coordinates
