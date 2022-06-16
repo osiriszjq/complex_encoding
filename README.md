@@ -12,7 +12,7 @@ The University of Adelaide
 This is the official implementation of the paper "Trading Positional Complexity vs Deepness in Coordinate Networks".
 
 #### Illustration of different methods to extend 1D encoding
-    ![Illustration of different methods to extend 1D encoding](imgs/simple_complex_encoding.png)
+![Illustration of different methods to extend 1D encoding](imgs/simple_complex_encoding.png)
     
     
 ## Google Colab
