@@ -1,10 +1,10 @@
 # Trading Positional Complexity vs Deepness in Coordinate Networks
-### [Project Page]() | [Paper]()
+### [Project Page](https://osiriszjq.github.io/complex_encoding) | [Paper](https://arxiv.org/pdf/2205.08987.pdf)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
 [Jianqiao Zheng](https://github.com/osiriszjq/),
-[Sameera Ramasinghe](),
+[Sameera Ramasinghe](https://scholar.google.pl/citations?user=-j0m9aMAAAAJ&hl=en),
 [Xueqian Li](https://lilac-lee.github.io/),
 [Simon Lucey](https://www.adelaide.edu.au/directory/simon.lucey)<br>
 The University of Adelaide
