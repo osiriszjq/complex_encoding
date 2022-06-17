@@ -1,0 +1,1 @@
+### Project website for arXiv paper "Trading Positional Complexity vs Deepness in Coordinate Networks".

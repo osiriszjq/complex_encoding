@@ -1,0 +1,1576 @@
+<html>
+
+<head>
+    <title>Trading Positional Complexity vs Deepness in Coordinate Networks</title>
+    <meta https-equiv="content-type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="./assets/css/academicons.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
+    <link rel="stylesheet" type="text/css" href="./assets/css/font-awesome.min.css" />
+</head>
+
+<html>
+
+<body>
+    <div id="content">
+        <h1>Trading Positional Complexity vs Deepness <br>in Coordinate Networks</h1>
+        <div style="text-align: center">
+            <span class="author"><a href="https://github.com/osiriszjq" target='_blank'>Jianqiao Zheng</a></span>
+            <span class="author"><a href="https://scholar.google.com.au/citations?user=-j0m9aMAAAAJ&hl=en" target='_blank'>Sameera Ramasinghe</a></span>
+            <span class="author"><a href="https://lilac-lee.github.io/" target='_blank'>Xueqian Li</a></span>
+            <span class="author"><a href="https://www.adelaide.edu.au/directory/simon.lucey/" target='_blank'>Simon Lucey</a></span>
+        </div>
+        <div class="affil">
+            <span style="padding-right: 2em">The University of Adelaide</span>
+        </div>
+        <div class="venue">arXiv preprint<br></div>
+
+        <table class='icon_tb'>
+            <tr>
+                <td>
+                    <div class='icons'>
+                    <a href="https://arxiv.org/pdf/2111.01253.pdf" target='_blank'><img class="layered-paper" src="./resources/paper_first_page.png"/><span>paper</span></a></div>
+                </td>
+                <td>
+                    <div class='icons'>
+                    <a href="https://arxiv.org/pdf/2111.01253.pdf" target='_blank'><img class="layered-paper" src="./resources/appendix_first_page.png"/><span>appendix</span></a></div>
+                </td>
+                <td>
+                    <div class='icons'>
+                    <a href="https://github.com/osiriszjq/complex_encoding/tree/main" target='_blank'><i class="fa fa-github"></i><span>code</span></a></div>
+                </td>
+                <td>
+                    <div class='icons'>
+                    <a href="https://drive.google.com/drive/folders/1Hd2_hklrDkxzeVNIAg_7TSF5dcIlKazG?usp=sharing" target='_blank'><i class="fa fa-database"></i><span>data</span></a></div>
+                </td>
+            </tr>
+        </table>
+
+        <hr>
+        <div class="text">
+        <div class="divider"><img src="./resources/first_fig.png" width=800></div>
+        <p class='caption'>
+            Illustration of different methods to extend 1D encoding of length <strong>K</strong> to 
+            <strong>N</strong>-dimensional case. 
+            Simple encoding is the widely used method currently, which is only the concatenation of encodings in each dimension 
+            to get a <strong>NK</strong> size encoding. We propose an alternative encoding method: 
+            conduct mode-<strong>n</strong> product to get the <strong>N</strong> dimensional cube, 
+            which we define as the complex encoding.
+        </p>
+        </div>
+
+        <h2>Abstract</h2>
+        <div class="text">
+            <p>It is well noted that coordinate-based MLPs benefit---in terms of preserving high-frequency information---
+                through the encoding of coordinate positions as an array of Fourier features. 
+                Hitherto, the rationale for the effectiveness of these positional encodings has been mainly studied 
+                through a Fourier lens. In this paper, we strive to broaden this understanding by showing that alternative
+                non-Fourier embedding functions can indeed be used for positional encoding. Moreover, we show that their 
+                performance is entirely determined by a trade-off between the stable rank of the embedded matrix and the 
+                distance preservation between embedded coordinates. We further establish that the now ubiquitous Fourier 
+                feature mapping of position is a special case that fulfills these conditions. 
+                Consequently, we present a more general theory to analyze positional encoding in terms of shifted basis functions.
+                In addition, we argue that employing a more complex positional encoding---that scales exponentially with the 
+                number of modes---requires only a linear (rather than deep) coordinate function to achieve comparable performance.
+                Counter-intuitively, we demonstrate that trading positional embedding complexity for network deepness is 
+                orders of magnitude faster than current state-of-the-art; despite the additional embedding complexity.
+                To this end, we develop the necessary theoretical formulae and empirically verify that 
+                our theoretical claims hold in practice.</p>
+        </div>
+
+        <br>
+        <hr>
+        <h2>Stable rank and the distance preservation of the embeddings</h2>
+        <div class="text">
+            <table align=center width=900px>
+                <tr>
+                    <td>
+                        <center>
+                            <img class='round' style='width:350px' src='./resources/stable_rank.png'>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <img class='round' style='width:350px' src='./resources/embed_distance.png'>
+                        </center>
+                    </td>
+
+                </tr>
+            </table>
+            <br>
+            <p class='caption'>
+                Quantitative comparison of the stable rank (left figure) and the distance preservation (right figure) 
+                of different embedders and RFFs. 
+                As expected, the stable rank of the impulse embedder strictly increases with the number of sampled points, 
+                causing poor distance preservation. The stable rank of the <b style='color: rgb(83, 168, 6)'>sine</b>
+                embedder is upper-bounded at <strong>2</strong>. 
+                The stable ranks of the <b style='color: rgb(247, 140, 70)'>square</b> embedder and the 
+                <b style='color: rgb(83, 168, 6)'>sine</b> embedder almost overlap. 
+                However, if the sample numbers are extremely high (not shown in the figure), their stable ranks begin to deviate.
+                Similarly, the <b style='color: rgb(247, 140, 70)'>square</b> embedder demonstrates perfect distance preservation,
+                and the <b style='color: rgb(83, 168, 6)'>sine</b> embedder is a close competitor. In contrast, 
+                the <b style='color: rgb(214, 39, 40)'>Gaussian</b> embedder and the <b style='color: rgb(148, 103, 189)'>RFF</b>
+                showcase mid-range upper bounds for the stable rank and adequate distance preservation, 
+                advocating a much better trade-off between memorization and generalization.
+            </p>
+        </div>
+
+        <br>
+        <hr>
+        <h2>3D: video reconstruction (separable coordinates)</h2>
+        <div class="text">
+            <p>
+                We provide a reconstruction results for 2 videos using separable coordinates (regular-grid sampled training points)
+                with different combinations fo simple or complex encodings and network depths.
+                Complex encodings with only one single linear layer (without hidden non-linear layers) have comparable performance
+                to simple encodings with deep non-linear MLPs (5 layer MLPs).
+                Complex shifted encodings outperformed complex Fourier feature-based encodings.
+            </p>
+            <table align=center width=900px>
+                <br>
+                <tr>
+                    <th scope= 'col' style='font-size: 22px'></th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, Depth 4</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 1</th>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LinF</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V0D0linearfR13.21.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V0D5linearfR25.15.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV0D0linearfR11.47.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV0D1linearfR24.78.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LogF</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V0D0logfR13.21.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V0D5logfR25.31.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV0D0logfR13.09.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV0D1logfR25.24.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>RFF</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V0D0rffR13.30.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V0D5rffR24.93.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV0D0rffR16.14.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV0D1rffR25.51.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Tri</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V0D0linearR13.21.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V0D5linearR18.30.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV0D0linearR23.23.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV0D1linearR25.46.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Gau</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V0D0gaussianR13.21.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V0D5gaussianR22.94.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV0D0gaussianR23.93.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV0D1gaussianR25.31.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br>
+        
+        <div class="text">
+            <table align=center width=900px>
+                <br>
+                <tr>
+                    <th scope= 'col' style='font-size: 22px'></th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, Depth 4</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 1</th>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LinF</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V1D0linearfR14.42.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V1D5linearfR22.45.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV1D0linearfR14.66.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV1D1linearfR23.66.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LogF</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V1D0logfR14.42.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V1D5logfR22.51.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV1D0logfR16.57.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV1D1logfR23.96.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>RFF</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V1D0rffR14.67.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V1D5rffR23.38.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV1D0rffR19.06.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV1D1rffR23.85.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Tri</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V1D0linearR14.42.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V1D5linearR14.49.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV1D0linearR22.18.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV1D1linearR24.25.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Gau</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V1D0gaussianR14.41.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple/V1D5gaussianR20.46.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV1D0gaussianR23.02.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex/KV1D1gaussianR24.01.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br>
+        <hr>
+
+        <h2>3D: video reconstruction (non-separable coordinates)</h2>
+        <div class="text">
+            <p>
+                We provide a reconstruction results for 2 videos using non-separable coordinates (randomly sampled training points)
+                with different combinations fo simple or complex encodings and network depths.
+                Complex encodings with only one single linear layer (without hidden non-linear layers) have comparable performance
+                to simple encodings with deep non-linear MLPs (5 layer MLPs).
+                Complex shifted encodings outperformed complex Fourier feature-based encodings.
+            </p>
+            <table align=center width=900px>
+                <br>
+                <tr>
+                    <th scope= 'col' style='font-size: 22px'></th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, Depth 4</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 1</th>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LinF</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV3D0linearfR25.28.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV3D5linearfR25.68.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV3D0linearfR9.87.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV3D1linearfR9.86.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LogF</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV3D0logfR25.62.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV3D5logfR25.25.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV3D0logfR11.89.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV3D1logfR11.85.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>RFF</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV3D0rffR11.63.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV3D5rffR11.63.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV3D0rffR22.60.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV3D1rffR22.28.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Tri</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV3D0linearR24.77.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV3D5linearR24.51.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV3D0linearR24.20.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV3D1linearR24.20.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Gau</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV3D0gaussianR24.37.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV3D5gaussianR11.63.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV3D0gaussianR24.75.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV3D1gaussianR24.75.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br>
+
+        <div class="text">
+            <table align=center width=900px>
+                <br>
+                <tr>
+                    <th scope= 'col' style='font-size: 22px'></th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, Depth 4</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 1</th>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LinF</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV4D0linearfR23.16.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV4D5linearfR22.95.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV4D0linearfR11.28.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV4D1linearfR11.33.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LogF</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV4D0logfR22.28.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV4D5logfR22.91.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV4D0logfR13.69.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV4D1logfR13.74.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>RFF</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV4D0rffR22.37.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV4D5rffR22.36.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV4D0rffR16.98.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV4D1rffR17.93.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Tri</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV4D0linearR23.31.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV4D5linearR22.44.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV4D0linearR20.11.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV4D1linearR20.11.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Gau</th>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV4D0gaussianR21.49.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/simple_random/RV4D5gaussianR21.99.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV4D0gaussianR20.55.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <video controls autoplay muted playsinline>
+                                <source src='./resources/complex_random/KRV4D1gaussianR20.55.mp4' type='video/mp4'>
+                            </video>
+                        </center>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <br>
+        <hr>
+        <h2>2D: image reconstruction (separable coordinates)</h2>
+        <div class="text">
+            <p>
+                We provide a reconstruction results for 2 images (an archway and a heap of walnuts) using separable coordinates
+                (regular-grid sampled training points) with different combinations fo simple or complex encodings and network depths.
+                Complex encodings with only one single linear layer (without hidden non-linear layers) have comparable performance
+                to simple encodings with deep non-linear MLPs (5 layer MLPs).
+                Complex shifted encodings outperformed complex Fourier feature-based encodings.
+            </p>
+            <table align=center width=900px>
+                <br>
+                <tr>
+                    <center>
+                        <th scope='col' colspan='5' style='font-size: 22px'>Ground truth</th>
+                    </center>
+                </tr>
+                <tr>
+                    <td colspan='5'>
+                        <center>
+                            <iframe src='./resources/imgs/archway/gt0.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'col' style='font-size: 22px'></th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, Depth 4</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 1</th>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LinF</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/I0D0linearf13.399517059326172.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/I0D4linearf22.034942626953125.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/KI0D0linearf17.286392211914062.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/KI0D1linearf22.80219268798828.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LogF</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/I0D0logf13.39910888671875.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/I0D4logf21.80258560180664.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/KI0D0logf19.96674346923828.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/KI0D1logf22.70826530456543.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>RFF</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/I0D0rff12.931443214416504.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/I0D4rff22.3806095123291.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/KI0D0rff19.37461280822754.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/KI0D1rff22.789939880371094.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Tri</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/I0D0linear414.067766189575195.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/I0D4linear421.748310089111328.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/KI0D0linear22.770523071289062.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/KI0D1linear23.052074432373047.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Gau</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/I0D0gaussian414.084786415100098.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/I0D4gaussian421.913652420043945.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/KI0D0gaussian22.84891128540039.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/archway/KI0D1gaussian22.822248458862305.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <br>
+        <div class="text">
+            <table align=center width=900px>
+                <br>
+                <tr>
+                    <center>
+                        <th scope='col' colspan='5' style='font-size: 22px'>Ground truth</th>
+                    </center>
+                </tr>
+                <tr>
+                    <td colspan='5'>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/gt8.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'col' style='font-size: 22px'></th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, Depth 4</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 1</th>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LinF</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/I2D0linearf12.895837783813477.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/I2D4linearf21.354290008544922.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/KI2D0linearf18.943384170532227.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/KI2D1linearf23.011333465576172.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LogF</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/I2D0logf12.895147323608398.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/I2D4logf21.660987854003906.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/KI2D0logf20.71030044555664.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/KI2D1logf22.912656784057617.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>RFF</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/I2D0rff13.173209190368652.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/I2D4rff22.433609008789062.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/KI2D0rff20.770465850830078.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/KI2D1rff22.9678955078125.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Tri</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/I2D0linear413.873435974121094.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/I2D4linear421.977025985717773.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/KI2D0linear22.741395950317383.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/KI2D1linear23.131093978881836.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Gau</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/I2D0gaussian413.886933326721191.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/I2D4gaussian422.294361114501953.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/KI2D0gaussian22.906505584716797.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/walnuts/KI2D1gaussian22.907655715942383.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <br>
+        <hr>
+        <h2>2D: image reconstruction (non-separable coordinates)</h2>
+        <div class="text">
+            <p>
+                We provide a reconstruction results for 2 images (a lion and a seaside residential area) using 
+                non-separable coordinates (randomly sampled training points)
+                with different combinations fo simple or complex encodings and network depths.
+                Complex encodings with only one single linear layer (without hidden non-linear layers) have comparable performance
+                to simple encodings with deep non-linear MLPs (5 layer MLPs).
+                Complex shifted encodings outperformed complex Fourier feature-based encodings.
+            </p>
+            <table align=center width=900px>
+                <br>
+                <tr>
+                    <center>
+                        <th scope='col' colspan='5' style='font-size: 22px'>Ground truth</th>
+                    </center>
+                </tr>
+                <tr>
+                    <td colspan='5'>
+                        <center>
+                            <iframe src='./resources/imgs/lion/gt14.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'col' style='font-size: 22px'></th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, Depth 4</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 1</th>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LinF</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/I3D0linearf16.32392120361328.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/I3D4linearf28.10896873474121.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/KI3D0linearf20.044260025024414.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/KI3D1linearf30.543012619018555.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LogF</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/I3D0logf16.33014488220215.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/I3D4logf28.792766571044922.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/KI3D0logf26.10403060913086.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/KI3D1logf30.578079223632812.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>RFF</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/I3D0rff15.48464584350586.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/I3D4rff30.090787887573242.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/KI3D0rff26.55160140991211.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/KI3D1rff30.751384735107422.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Tri</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/I3D0linear418.579498291015625.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/I3D4linear429.16744613647461.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/KI3D0linear29.890459060668945.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/KI3D1linear30.5660400390625.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Gau</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/I3D0gaussian418.638341903686523.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/I3D4gaussian428.56854248046875.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/KI3D0gaussian30.708398818969727.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/lion/KI3D1gaussian30.79242515563965.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <br>
+        <div class="text">
+            <table align=center width=900px>
+                <br>
+                <tr>
+                    <center>
+                        <th scope='col' colspan='5' style='font-size: 22px'>Ground truth</th>
+                    </center>
+                </tr>
+                <tr>
+                    <td colspan='5'>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/gt2.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'col' style='font-size: 22px'></th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Simple, Depth 4</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 0</th>
+                    <th scope= 'col' style='font-size: 22px'>Complex, Depth 1</th>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LinF</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/I1D0linearf15.001716613769531.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/I1D4linearf24.159984588623047.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/KI1D0linearf17.585323333740234.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/KI1D1linearf24.928510665893555.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>LogF</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/I1D0logf15.00512981414795.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/I1D4logf24.399532318115234.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/KI1D0logf21.336566925048828.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/KI1D1logf24.885385513305664.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>RFF</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/I1D0rff12.419638633728027.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/I1D4rff24.694082260131836.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/KI1D0rff20.90374183654785.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/KI1D1rff24.909704208374023.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Tri</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/I1D0linear416.334697723388672.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/I1D4linear423.643287658691406.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/KI1D0linear24.826854705810547.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/KI1D1linear25.187759399414062.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope= 'row' style='font-size: 22px; -ms-writing-mode: tb-rl;
+                    -webkit-writing-mode: vertical-rl;
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;'>Gau</th>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/I1D0gaussian416.37228012084961.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/I1D4gaussian423.353654861450195.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/KI1D0gaussian24.993011474609375.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <iframe src='./resources/imgs/seahouse/KI1D1gaussian24.936073303222656.pdf' style='width: 128px;height: 128px;' frameborder='0'></iframe>
+                        </center>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <br>
+        <hr>
+        <h2>Citation</h2>
+            <div class="bibtex">
+                @article{zheng2022trading,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;title={Trading Positional Complexity vs Deepness in Coordinate Networks},<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;author={Zheng, Jianqiao and Ramasinghe, Sameera and Li, Xueqian and Lucey, Simon},<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;journal={arXiv preprint arXiv:2204.},<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;year={2022}<br>
+                }
+            </div>
+
+        <br>
+        <hr>
+        <div class='ack_temp'>
+		<p>
+            This template was inspired by project pages from <a href="https://chenhsuanlin.bitbucket.io/">Chen-Hsuan Lin</a> and <a href="http://richzhang.github.io/">Richard Zhang</a>.
+		</p>
+	    </div>
+    </div>
+</body>
+</html>
