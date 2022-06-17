@@ -16,8 +16,8 @@ This is the official implementation of the paper "Trading Positional Complexity 
     
     
 ## Google Colab
-[![Explore Siren in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1RNBW9RbOjOmAm2B1DtzdpuR1N03hyaAv)<br>
-If you want to try out our new complex encoding, we have written a [Colab](https://colab.research.google.com/drive/1RNBW9RbOjOmAm2B1DtzdpuR1N03hyaAv) with the following experiments:
+[![Explore Siren in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/osiriszjq/complex_encoding/blob/main/complex_encoding.ipynb)<br>
+If you want to try out our new complex encoding, we have written a [Colab](https://colab.research.google.com/github/osiriszjq/complex_encoding/blob/main/complex_encoding.ipynb) with the following experiments:
 * simple encoding for 2D image reconstuction with separable coordinates
 * complex encoding for 2D image reconstuction with separable coordinates
 * colsed form solution of complex encoding for 2D image reconstuction with separable coordinates. 
