@@ -9,7 +9,7 @@
 [Simon Lucey](https://www.adelaide.edu.au/directory/simon.lucey)<br>
 The University of Adelaide
 
-This is the official implementation of the paper "Trading Positional Complexity vs Deepness in Coordinate Networks".
+This is the official implementation of the paper "Trading Positional Complexity vs Deepness in Coordinate Networks", which has been accepted to ECCV 2022.
 
 #### Illustration of different methods to extend 1D encoding
 ![Illustration of different methods to extend 1D encoding](imgs/simple_complex_encoding.png)
