@@ -20,4 +20,9 @@ This is the official implementation of the paper "Trading Positional Complexity 
 If you want to try out our new complex encoding, we have written a [Colab](https://colab.research.google.com/github/osiriszjq/complex_encoding/blob/main/complex_encoding.ipynb) with the following experiments:
 * simple encoding for 2D image reconstuction with separable coordinates
 * complex encoding for 2D image reconstuction with separable coordinates
-* colsed form solution of complex encoding for 2D image reconstuction with separable coordinates. 
+* colsed form solution of complex encoding for 2D image reconstuction with separable coordinates.
+
+
+## Dataset
+The Dataset used to reproduced can be found in [Google Drive]（https://drive.google.com/drive/folders/1yLVG1WT5i9PxchNqAb84nJdHuLlNPCj4?usp=sharing). The image data is from [Random Fourier Frequency](https://github.com/tancik/fourier-feature-networks) and the video data is from [Youtube](https://research.google.com/youtube-bb/).
+
