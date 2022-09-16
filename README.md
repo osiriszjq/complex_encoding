@@ -21,8 +21,21 @@ If you want to try out our new complex encoding, we have written a [Colab](https
 * simple encoding for 2D image reconstuction with separable coordinates
 * complex encoding for 2D image reconstuction with separable coordinates
 * colsed form solution of complex encoding for 2D image reconstuction with separable coordinates.
+* simple encoding for 3D video reconstuction with non-separable coordinates
+* complex encoding for 3D video reconstuction with non-separable coordinates
 
 
 ## Dataset
 The Dataset used to reproduced can be found in [Google Drive](https://drive.google.com/drive/folders/1yLVG1WT5i9PxchNqAb84nJdHuLlNPCj4?usp=sharing). The image data is from [Random Fourier Frequency](https://github.com/tancik/fourier-feature-networks) and the video data is from [Youtube](https://research.google.com/youtube-bb/).
 
+
+## Citation
+```bibtex
+@inproceedings{zheng2022trading,
+    title={Trading Positional Complexity vs Deepness in Coordinate Networks},
+    author={Zheng, Jianqiao and Ramasinghe, Sameera and Li, Xueqian and Lucey, Simon},
+    booktitle={Proceedings of the European Conference on Computer Vision (ECCV)},
+    year={2022}
+}
+}
+```
