@@ -37,5 +37,4 @@ The Dataset used to reproduced can be found in [Google Drive](https://drive.goog
     booktitle={Proceedings of the European Conference on Computer Vision (ECCV)},
     year={2022}
 }
-}
 ```
