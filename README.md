@@ -1,5 +1,5 @@
 # Trading Positional Complexity vs Deepness in Coordinate Networks
-### [Project Page](https://osiriszjq.github.io/complex_encoding) | [Paper](https://arxiv.org/pdf/2205.08987.pdf)
+### [Project Page](https://osiriszjq.github.io/complex_encoding) | [Paper](https://www.ecva.net/papers/eccv_2022/papers_ECCV/papers/136870142.pdf)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
